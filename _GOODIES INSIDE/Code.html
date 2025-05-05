@@ -1,0 +1,849 @@
+﻿﻿
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HelpChat Lab Snippets</title>
+
+    <!-- PicoCSS for styling -->
+    <link rel="stylesheet" href="https://unpkg.com/@picocss/pico@latest/css/pico.min.css">
+
+    <!-- Highlight.js for syntax highlighting -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script>hljs.highlightAll();</script>
+
+    <style>
+        .code-container {
+            position: relative;
+            margin-bottom: 2rem;
+        }
+
+        .code-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 0.5rem;
+            box-sizing: border-box;
+            z-index: 1;
+        }
+
+        .filename {
+            background-color: #f2f2f2;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-family: monospace;
+            color: darkslategray
+        }
+
+        .copy {
+            font-size: 0.8rem;
+        }
+
+        pre {
+            padding-top: 2.5rem;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 600;
+            background: linear-gradient(45deg, #4fc3f7, #0288d1);
+            color: white;
+            text-shadow: 0 2px 5px rgba(0, 0, 0, 0.7);
+            margin-bottom: 4rem;
+            border-bottom: 3px solid #0288d1;
+            padding: 0.5rem 1rem;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+
+            h1::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(255, 255, 255, 0.15);
+                transform: scaleX(0);
+                transform-origin: bottom right;
+                transition: transform 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+            }
+
+            h1:hover::before {
+                transform: scaleX(1);
+                transform-origin: bottom left;
+            }
+
+
+        h2 {
+            border-bottom: 1px solid white;
+            padding-bottom: 12px;
+        }
+
+        table td:first-child {
+            font-weight: bold;
+        }
+
+    </style>
+</head>
+<body>
+    <main class="container">
+        <h1>HelpChat Programming Lab</h1>
+
+            <h2>Files in order of usage</h2>
+            <table class="striped" data-theme="dark">
+                <thead data-theme="light">
+                    <tr>
+                        <th scope="col">File</th>
+                        <th scope="col">Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>MainWindow.xaml.cs</td>
+                        <td>Code for main window interface</td>
+                    </tr>
+                    <tr>
+                        <td>ViewModels\ChatViewModel.cs</td>
+                        <td>Main viewmodel for the entire application</td>
+                    </tr>
+                    <tr>
+                        <td>Services\ChatService.cs</td>
+                        <td>Functions that get responses from the language models</td>
+                    </tr>
+                    <tr>
+                        <td>Prompts\Welcome.txt</td>
+                        <td>Prompt for generation of welcome message</td>
+                    </tr>
+                    <tr>
+                        <td>Prompts\LanguageModel.txt</td>
+                        <td>Prompt for generation of responses from language models (same prompt for cloud and local)</td>
+                    </tr>
+                    <tr>
+                        <td>Evaluators\IEvaluator.cs</td>
+                        <td>Interface for evaluator classes</td>
+                    </tr>
+                    <tr>
+                        <td>Evaluators\Evaluators.cs</td>
+                        <td>Decision helper for evaluators</td>
+                    </tr>
+                    <tr>
+                        <td>Evaluators\PrivacyEvaluator.cs</td>
+                        <td>Evaluates if we should use the cloud or not based on privacy concerns</td>
+                    </tr>
+                    <tr>
+                        <td>Evaluators\NetworkEvaluator.cs</td>
+                        <td>Evaluates if we should use the cloud or not based on network availability and latency</td>
+                    </tr>
+                    <tr>
+                        <td>Services\LocalClassifierService.cs</td>
+                        <td>Runs the local ONNX classifier model</td>
+                    </tr>
+                </tbody>
+            </table>
+        
+
+        <h2>Code snippets</h2>
+
+        <section>
+            <p>Click "Copy" to grab the code, then paste it into Visual Studio in the appropriate places.</p>
+        </section>
+
+        <h2>1. Show a welcome message</h2>
+
+        <section>
+            <h3>1.1 Tell the viewmodel to show a welcome message</h3>
+            <div class="code-container">
+                <div class="code-meta">
+                    <span class="filename">MainWindow.xaml.cs</span>
+                    <button class="copy" onclick="copyCode(this)">Copy</button>
+                </div>
+                <pre><code class="language-xml">
+await ViewModel.AddWelcomeMessage();
+</code></pre>
+            </div>
+        </section>
+
+        <section>
+            <h3>1.2 Create the message and pass it along to the Phi Silica service to populate</h3>
+            <div class="code-container">
+                <div class="code-meta">
+                    <span class="filename">ChatViewModel.cs</span>
+                    <button class="copy" onclick="copyCode(this)">Copy</button>
+                </div>
+                <pre><code class="language-csharp">
+var welcomeMessage = new HelpChatMessage
+    {
+    Role = MessageRole.Assistant,
+    Source = MessageSource.LocalSLM
+    };
+
+Messages.Add(welcomeMessage);
+await _chatService.WelcomeUser(welcomeMessage);
+</code></pre>
+            </div>
+        </section>
+
+        <section>
+            <h3>1.3 Use Phi Silica to populate the message</h3>
+            <div class="code-container">
+                <div class="code-meta">
+                    <span class="filename">ChatService.cs</span>
+                    <button class="copy" onclick="copyCode(this)">Copy</button>
+                </div>
+                <pre><code class="language-csharp">
+WindowDispatcherQueue.TryEnqueue(() => welcomeMessage.IsThinking = true);
+
+string fullResult = "";
+await foreach (var partialResult in _chatClient.GetStreamingResponseAsync(
+                   [
+                     new ChatMessage(
+                         ChatRole.User,
+                         FileUtils.GetFileContents("Prompts\\Welcome.txt")),
+                   ],
+                   null)) {
+  fullResult += partialResult;
+
+  WindowDispatcherQueue.TryEnqueue(() => welcomeMessage.Content = fullResult);
+}
+
+WindowDispatcherQueue.TryEnqueue(() => welcomeMessage.IsThinking = false);
+
+//TODO 1.4 Edit prompt in Welcome.txt
+</code></pre>
+            </div>
+        </section>
+
+        <section>
+            <h3>1.4 Write the prompt for Phi Silica (use this or whatever you want 😄)</h3>
+            <div class="code-container">
+                <div class="code-meta">
+                    <span class="filename">Welcome.txt</span>
+                    <button class="copy" onclick="copyCode(this)">Copy</button>
+                </div>
+                <pre><code class="text">
+You are part of a support system for end-users. Write a brief welcome message to indicate to the user that you are initialized and ready!
+</code></pre>
+            </div>
+        </section>
+
+        <h2>2. Handle submitted messages</h2>
+        <section>
+            <h3>2.1 Validate and pass along user input to the viewmodel</h3>
+            <div class="code-container">
+                <div class="code-meta">
+                    <span class="filename">MainWindow.xaml.cs</span>
+                    <button class="copy" onclick="copyCode(this)">Copy</button>
+                </div>
+                <pre><code class="language-csharp">
+//Don't do anything with an empty message
+string messageText = MessageTextBox.Text.Trim();
+if (string.IsNullOrEmpty(messageText))
+    return;
+
+//Don't do anything if there are messages in progress
+foreach (var message in ViewModel.Messages) if (message.IsThinking) return;
+
+Log.Information($"❓ {messageText}");
+
+//Clear the message textbox
+MessageTextBox.Text = "";
+
+await ViewModel.AddNewUserMessage(messageText, _cancellationTokenSource);
+</code></pre>
+            </div>
+        </section>
+
+        <section>
+            <h3>2.2 Wire this up to the button click</h3>
+            <div class="code-container">
+                <div class="code-meta">
+                    <span class="filename">MainWindow.xaml.cs</span>
+                    <button class="copy" onclick="copyCode(this)">Copy</button>
+                </div>
+                <pre><code class="language-csharp">
+await SendMessage();
+</code></pre>
+        </section>
+
+        <section>
+            <h3>2.3 Wire this up to the enter button</h3>
+            <div class="code-container">
+                <div class="code-meta">
+                    <span class="filename">MainWindow.xaml.cs</span>
+                    <button class="copy" onclick="copyCode(this)">Copy</button>
+                </div>
+                <pre><code class="language-csharp">
+if (e.Key == Windows.System.VirtualKey.Enter)
+{
+    e.Handled = true;
+    await SendMessage();
+}
+</code></pre>
+        </section>
+
+        <section>
+            <h3>2.4 Add user message to the message list</h3>
+            <div class="code-container">
+                <div class="code-meta">
+                    <span class="filename">ChatViewModel.cs</span>
+                    <button class="copy" onclick="copyCode(this)">Copy</button>
+                </div>
+                <pre><code class="language-csharp">
+var userMessage = new HelpChatMessage()
+{
+    Role = MessageRole.User,
+    Content = input
+};
+Messages.Add(userMessage);
+
+</code></pre>
+        </section>
+
+
+        <h2>3. Get cloud ONNX result</h2>
+        <section>
+            <h3>3.1 Set up the result message</h3>
+            <div class="code-container">
+                <div class="code-meta">
+                    <span class="filename">ChatViewModel.cs</span>
+                    <button class="copy" onclick="copyCode(this)">Copy</button>
+                </div>
+                <pre><code class="language-csharp">
+    IClassifierService classifierService;
+
+    //TODO Insert 8.2a below
+
+    //Insert above
+
+    //Get where to direct the message using cloud ONNX model
+    classifierService = new CloudClassifierService();
+    var label = await classifierService.GetClassifiedLabel(input, Labels.CandidateLabels);
+
+    //Let user know we used the cloud model
+    var helpMessage = new HelpChatMessage
+    {
+    Role = MessageRole.System,
+    Content = $"🔀☁️ Used cloud ONNX model to determine this request is for {label}",
+    Source = MessageSource.SystemGenerated
+    };
+    Messages.Add(helpMessage);
+</code></pre>
+            </div>
+        </section>
+
+        <section>
+            <h3>3.2 Determine the best label using the endpoint</h3>
+            <div class="code-container">
+                <div class="code-meta">
+                    <span class="filename">ChatViewModel.cs</span>
+                    <button class="copy" onclick="copyCode(this)">Copy</button>
+                </div>
+                <pre><code class="language-csharp">
+            var data = new
+            {
+                text = input,
+                labels = labels
+            };
+
+            var json = JsonConvert.SerializeObject(data);
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+
+            using (var client = new HttpClient())
+            {
+                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", KEY);
+
+                try
+                {
+                    var response = await client.PostAsync(URL, content);
+                    var result = await response.Content.ReadAsStringAsync();
+
+                    if (!response.IsSuccessStatusCode)
+                    {
+                        Console.WriteLine($"The request failed with status code: {response.StatusCode}");
+                        Console.WriteLine(result);
+                    }
+                    else
+                    {
+                        //Get the actual json string from the response
+                        string innerJson = JsonConvert.DeserializeObject&lt;string&gt;(result);
+
+                        Log.Information($"🏷️ Cloud classifier says {innerJson}");
+
+                        //Deserialize the json
+                        var deserialized = JsonConvert.DeserializeObject&lt;List&lt;List&lt;object&gt;&gt;&gt;(innerJson);
+
+                        //Return the name of the most likely label
+                        return deserialized.First()[0].ToString();
+                    }
+                }
+                catch (HttpRequestException ex)
+                {
+                    Console.WriteLine($"Request error: {ex.Message}");
+                }
+
+
+                return "";
+            }
+
+</code></pre>
+            </div>
+        </section>
+
+        <h2>4. Get ChatGPT response</h2>
+        <section>
+            <h3>4.1 Set up the prompt</h3>
+            <div class="code-container">
+                <div class="code-meta">
+                    <span class="filename">ChatViewModel.cs</span>
+                    <button class="copy" onclick="copyCode(this)">Copy</button>
+                </div>
+                <pre><code class="language-csharp">
+//Generate the prompt for the language model
+var prompt = FileUtils.GetFileContents("Prompts\\LanguageModel.txt").Replace("{label}", label).Replace("{input}", input);
+
+//TODO 4.2 Edit prompt in LanguageModel.txt
+</code></pre>
+            </div>
+        </section>
+
+        <section>
+            <h3>4.2 Write the prompt for language models (again, use this or whatever you want 😄) &mdash; note use of {label} and {input}</h3>
+            <div class="code-container">
+                <div class="code-meta">
+                    <span class="filename">LanguageModel.txt</span>
+                    <button class="copy" onclick="copyCode(this)">Copy</button>
+                </div>
+                <pre><code class="text">
+You are a helpful, professional customer support agent specializing in {label}. You are speaking directly to a customer. If the request is general, make it specific about a pretend product or account. For example, if someone asks "how many calories are in a hamburger", answer as if they are asking about a hamburger your company makes.
+
+Respond as a real agent would — do not mention AI, do not mention being a model. Simply respond as if you're a human agent helping the customer.
+
+{input}
+</code></pre>
+            </div>
+        </section>
+
+        <section>
+            <h3>4.3 Add LLM message to the message list</h3>
+            <div class="code-container">
+                <div class="code-meta">
+                    <span class="filename">ChatViewModel.cs</span>
+                    <button class="copy" onclick="copyCode(this)">Copy</button>
+                </div>
+                <pre><code class="language-csharp">
+        IsChatThinking = true;
+
+
+        //Get LLM response
+        var newMessage = new HelpChatMessage
+        {
+            Role = MessageRole.Assistant,
+            Content = "",
+            Source = MessageSource.AzureOpenAI
+        };
+        Messages.Add(newMessage);
+        await _chatService.CallAzure(newMessage, prompt);
+
+        IsChatThinking = false;
+</code></pre>
+            </div>
+        </section>
+
+        <section>
+            <h3>4.4 Get a chat response from Azure</h3>
+            <div class="code-container">
+                <div class="code-meta">
+                    <span class="filename">ChatService.cs</span>
+                    <button class="copy" onclick="copyCode(this)">Copy</button>
+                </div>
+                <pre><code class="language-csharp">
+Log.Information($"🧠 Generating Azure OpenAI response to '{prompt}'");
+
+outputMessage.IsThinking = true;
+outputMessage.Content = "⏳🤔";
+
+string fullResult = "";
+
+var azureOpenAIService = new AzureOpenAIService();
+var chatUpdates = azureOpenAIService.Client.CompleteChatStreamingAsync([new OpenAI.Chat.UserChatMessage(prompt)]);
+
+await foreach (var chatUpdate in chatUpdates)
+{
+    foreach (var contentPart in chatUpdate.ContentUpdate)
+    {
+        fullResult += contentPart.Text;
+    }
+
+    WindowDispatcherQueue.TryEnqueue(() => outputMessage.Content = fullResult);
+}
+
+outputMessage.IsThinking = false;
+</code></pre>
+            </div>
+        </section>
+
+        <h2>5. Set up interface &amp; framework</h2>
+        <section>
+            <h3>5.1 Create evaluator interface</h3>
+            <div class="code-container">
+                <div class="code-meta">
+                    <span class="filename">IEvaluator.cs</span>
+                    <button class="copy" onclick="copyCode(this)">Copy</button>
+                </div>
+                <pre><code class="language-csharp">
+internal interface IEvaluator
+{
+    //Return true if we are OK to use the cloud
+    bool Evaluate(string input);
+}
+</code></pre>
+            </div>
+        </section>
+
+        <section>
+            <h3>5.2 Implement evaluators class</h3>
+            <div class="code-container">
+                <div class="code-meta">
+                    <span class="filename">Evaluators.cs</span>
+                    <button class="copy" onclick="copyCode(this)">Copy</button>
+                </div>
+                <pre><code class="language-csharp">
+List&lt;IEvaluator&gt; _evaluators = new List&lt;IEvaluator&gt;();
+
+internal Evaluators()
+{
+    //TODO Insert 8.1 below
+
+
+
+    //Insert above
+}
+
+internal bool UseCloud(string input)
+{
+    //To return true ("use the cloud"), we must either have no evaluators
+    //or all evaluators must return true
+    return (_evaluators.Count == 0 || _evaluators.All(x => x.Evaluate(input)));
+}
+</code></pre>
+            </div>
+        </section>
+
+        <section>
+            <h3>6.1 Implement privacy evaluator</h3>
+            <div class="code-container">
+                <div class="code-meta">
+                    <span class="filename">PrivacyEvaluator.cs</span>
+                    <button class="copy" onclick="copyCode(this)">Copy</button>
+                </div>
+                <pre><code class="language-csharp">
+  internal class PrivacyEvaluator : IEvaluator
+  {
+      public bool Evaluate(string input)
+      {
+          var isOk = !Regex.IsMatch(input, @"\d{5,}");
+
+          Log.Information($"🔎 Privacy evaluator says {(isOk ? "OK" : "fail")}");
+
+          return isOk;
+      }
+  }
+</code></pre>
+            </div>
+        </section>
+
+        <section>
+            <h3>7.1 Implement latency evaluator</h3>
+            <div class="code-container">
+                <div class="code-meta">
+                    <span class="filename">NetworkEvaluator.cs</span>
+                    <button class="copy" onclick="copyCode(this)">Copy</button>
+                </div>
+                <pre><code class="language-csharp">
+    internal class NetworkEvaluator : IEvaluator
+    {
+        public bool Evaluate(string input)
+        {
+            string host = App.Current.Resources["MLEndpoint"].ToString();
+            Ping ping = new Ping();
+
+            try
+            {
+                PingReply reply = ping.Send(host, 200); // 200 ms timeout
+
+                if (reply.Status == IPStatus.Success) //We are below 200 ms, doesn't matter what the number is
+                {
+                    Log.Information("🔎 Network evaluator OK");
+                    return true;
+                }
+                else
+                {
+                    throw new Exception();
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Information("🔎 Network evaluator fail");
+                return false;
+            }
+        }
+    }
+</code></pre>
+            </div>
+        </section>
+
+        <h2>8. Tie it all together</h2>
+        <section>
+            <h3>8.1 Add evaluators to use</h3>
+            <div class="code-container">
+                <div class="code-meta">
+                    <span class="filename">Evaluators.cs</span>
+                    <button class="copy" onclick="copyCode(this)">Copy</button>
+                </div>
+                <pre><code class="language-csharp">
+_evaluators.Add(new NetworkEvaluator());
+_evaluators.Add(new PrivacyEvaluator());
+</code></pre>
+            </div>
+        </section>
+
+        <section>
+            <h3>8.2a Add the evaluator conditional</h3>
+            <div class="code-container">
+                <div class="code-meta">
+                    <span class="filename">ChatViewModel.cs</span>
+                    <button class="copy" onclick="copyCode(this)">Copy</button>
+                </div>
+                <pre><code class="language-csharp">
+var evaluators = new HelpChat.Evaluators.Evaluators();
+
+if (evaluators.UseCloud(input)) //Use cloud
+{
+</code></pre>
+            </div>
+        </section>
+
+        <section>
+            <h3>8.2b Finish the evaluator conditional</h3>
+            <div class="code-container">
+                <div class="code-meta">
+                    <span class="filename">ChatViewModel.cs</span>
+                    <button class="copy" onclick="copyCode(this)">Copy</button>
+                </div>
+                <pre><code class="language-csharp">
+    }
+    else //Use local
+    {
+    //TODO Insert 10.1 below
+
+    //Insert above
+
+    //TODO Insert 10.2 below
+
+    //Insert above
+}
+</code></pre>
+            </div>
+        </section>
+
+        <h2>9. Get local ONNX result</h2>
+        <section>
+            <h3>9.1 Set up local classifier service</h3>
+            <div class="code-container">
+                <div class="code-meta">
+                    <span class="filename">LocalClassifierService.cs</span>
+                    <button class="copy" onclick="copyCode(this)">Copy</button>
+                </div>
+                <pre><code class="language-csharp">
+var sessionOptions = new SessionOptions();
+Dictionary&lt;string, string&gt; options = new()
+{
+    { "backend_path", "QnnHtp.dll" }
+};
+sessionOptions.AppendExecutionProvider("QNN");
+_inferenceSession = new InferenceSession(modelFile, sessionOptions);
+
+
+tokenizer = BertTokenizer.Create(tokenFile);
+</code></pre>
+            </div>
+        </section>
+
+        <section>
+            <h3>9.2 Run the local classifier</h3>
+            <div class="code-container">
+                <div class="code-meta">
+                    <span class="filename">LocalClassifierService.cs</span>
+                    <button class="copy" onclick="copyCode(this)">Copy</button>
+                </div>
+                <pre><code class="language-csharp">
+var scores = new List&lt;float&gt;();
+
+foreach (var label in labels)
+{
+    var (inputIds, attentionMask) = Tokenize(input, label);
+
+
+    var inputs = new List&lt;NamedOnnxValue&gt;
+    {
+        NamedOnnxValue.CreateFromTensor("input_ids", new DenseTensor&lt;long&gt;(inputIds, new[] { 1, inputIds.Length })),
+        NamedOnnxValue.CreateFromTensor("attention_mask", new DenseTensor&lt;long&gt;(attentionMask, new[] { 1, attentionMask.Length }))
+    };
+
+    using IDisposableReadOnlyCollection&lt;DisposableNamedOnnxValue&gt; results = _inferenceSession.Run(inputs);
+    var logits = results.First().AsEnumerable&lt;float&gt;().ToArray();
+
+    scores.Add(logits[0]);
+
+}
+
+// Softmax (scores --&gt; relative probaibilties) across all entailment scores
+float max = scores.Max(); // for numerical stability
+float[] exp = scores.Select(s =&gt; MathF.Exp(s - max)).ToArray();
+float sum = exp.Sum();
+float[] probs = exp.Select(e =&gt; e / sum).ToArray();
+
+// Final labeled results
+var resultsWithLabels = labels.Zip(probs, (label, prob) =&gt; (label, prob))
+                              .OrderByDescending(x =&gt; x.prob)
+                              .ToList();
+
+// Sort and display
+var sorted = resultsWithLabels.OrderByDescending(r =&gt; r.prob);
+foreach (var result in sorted)
+{
+    Log.Information($"🏷️ Local classifier says {result.label}: {result.prob:F4}");
+}
+
+return sorted.ToList();
+</code></pre>
+            </div>
+        </section>
+
+        <section>
+            <h3>9.3 Set up the result message</h3>
+            <div class="code-container">
+                <div class="code-meta">
+                    <span class="filename">ChatViewModel.cs</span>
+                    <button class="copy" onclick="copyCode(this)">Copy</button>
+                </div>
+                <pre><code class="language-csharp">
+    classifierService = _localClassifierService;
+    var label = await classifierService.GetClassifiedLabel(input, Labels.CandidateLabels);
+
+
+    //Let user know we used the local model
+    var helpMessage = new HelpChatMessage
+    {
+        Role = MessageRole.System,
+        Content = $"🔀💻 Used local ONNX model to determine this request is for {label}",
+        Source = MessageSource.SystemGenerated
+    };
+    Messages.Add(helpMessage);
+</code></pre>
+            </div>
+        </section>
+
+        <h2>10. Get Phi Silica result</h2>
+
+
+        <section>
+            <h3>10.1 Set up the chat message</h3>
+            <div class="code-container">
+                <div class="code-meta">
+                    <span class="filename">ChatViewModel.cs</span>
+                    <button class="copy" onclick="copyCode(this)">Copy</button>
+                </div>
+                <pre><code class="language-csharp">
+            //Generate the prompt for the language model (same as before)
+            var prompt = FileUtils.GetFileContents("Prompts\\LanguageModel.txt").Replace("{label}", label).Replace("{input}", input);
+
+            IsChatThinking = true;
+
+            //Get SLM response
+            var newMessage = new HelpChatMessage
+            {
+                Role = MessageRole.Assistant,
+                Content = "",
+                Source = MessageSource.LocalSLM
+            };
+            Messages.Add(newMessage);
+
+            try
+            {
+                await _chatService.GetChatResponseAsync(prompt, newMessage, cts.Token);
+            }
+            catch (OperationCanceledException)
+            {
+                Log.Information("Message sending was canceled.");
+            }
+            finally
+            {
+                newMessage.IsThinking = false;
+                IsChatThinking = false;
+            }
+</code></pre>
+            </div>
+        </section>
+
+        <section>
+            <h3>10.2 Populate the result message</h3>
+            <div class="code-container">
+                <div class="code-meta">
+                    <span class="filename">ChatService.cs</span>
+                    <button class="copy" onclick="copyCode(this)">Copy</button>
+                </div>
+                <pre><code class="language-csharp">
+        Log.Information($"🧠 Generating Phi Silica response to '{prompt}'");
+
+        outputMessage.IsThinking = true;
+        outputMessage.Content = "⏳🤔";
+
+        string fullResult = "";
+
+        await Task.Run(
+           async () =>
+           {
+               await foreach (var partialResult in _chatClient.GetStreamingResponseAsync(
+                   [
+                       new ChatMessage(ChatRole.User, prompt)
+                   ], null, cancellationToken))
+               {
+                   fullResult += partialResult;
+
+                   WindowDispatcherQueue.TryEnqueue(() => outputMessage.Content = fullResult);
+
+                   if (cancellationToken.IsCancellationRequested) break;
+               }
+           }, cancellationToken);
+
+        outputMessage.IsThinking = false;
+</code></pre>
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        function copyCode(button) {
+            const code = button.parentElement.nextElementSibling.innerText;
+            navigator.clipboard.writeText(code).then(() => {
+                const originalText = button.innerText;
+                button.innerText = 'Copied!';
+                setTimeout(() => button.innerText = originalText, 1500);
+            });
+        }
+    </script>
+</body>
+</html>

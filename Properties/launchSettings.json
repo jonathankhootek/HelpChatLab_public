@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "HelpChat (Package)": {
+      "commandName": "MsixPackage"
+    },
+    "HelpChat (Unpackaged)": {
+      "commandName": "Project"
+    }
+  }
+}

@@ -1,0 +1,97 @@
+<UserControl
+    x:Class="HelpChat.ChatItemsRepeaterControl"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:models="using:HelpChat.Models"
+    xmlns:viewmodels="using:HelpChat.ViewModels"
+    d:DataContext="{d:DesignInstance Type=viewmodels:ChatViewModel}"
+    mc:Ignorable="d">
+
+    <ItemsRepeater x:Name="ChatItemsRepeater" ItemsSource="{Binding Messages}">
+        <ItemsRepeater.ItemTemplate>
+            <DataTemplate x:DataType="models:HelpChatMessage" x:DefaultBindMode="OneWay">
+                <Grid Margin="0,4">
+                    <StackPanel x:Name="SystemMessage" Visibility="{x:Bind Role, Converter={StaticResource RoleToVisibilityConverter}, ConverterParameter=System}">
+                        <Grid Style="{StaticResource SystemBubbleStyle}">
+                            <controls:MarkdownTextBlock
+                                Foreground="White"
+                                Style="{StaticResource BubbleText}"
+                                Text="{x:Bind Content}" />
+                        </Grid>
+                        <StackPanel
+                            Margin="12,2,0,0"
+                            HorizontalAlignment="Left"
+                            Orientation="Horizontal">
+                            <TextBlock
+                                FontSize="10"
+                                Opacity="0.6"
+                                Text="{x:Bind Source}" />
+                            <TextBlock
+                                Margin="8,0,0,0"
+                                FontSize="10"
+                                Opacity="0.6"
+                                Text="{x:Bind Timestamp}" />
+                        </StackPanel>
+                    </StackPanel>
+
+
+                    <StackPanel x:Name="UserMessage" Visibility="{x:Bind Role, Converter={StaticResource RoleToVisibilityConverter}, ConverterParameter=User}">
+                        <Grid Style="{StaticResource UserBubbleStyle}">
+                            <controls:MarkdownTextBlock
+                                Foreground="White"
+                                Style="{StaticResource BubbleText}"
+                                Text="{x:Bind Content}" />
+                        </Grid>
+                        <TextBlock
+                            Margin="8,0,12,0"
+                            HorizontalAlignment="Right"
+                            FontSize="10"
+                            Opacity="0.6"
+                            Text="{x:Bind Timestamp}" />
+                    </StackPanel>
+
+                    <StackPanel x:Name="AssistantMessage" Visibility="{x:Bind Role, Converter={StaticResource RoleToVisibilityConverter}, ConverterParameter=Assistant}">
+                        <Grid Style="{StaticResource BotBubbleStyle}">
+
+                            <StackPanel Grid.Column="1">
+                                <controls:MarkdownTextBlock Style="{StaticResource BubbleText}" Text="{x:Bind Content}" />
+
+                                <ProgressRing
+                                    Width="20"
+                                    Height="20"
+                                    Margin="0,4,0,0"
+                                    HorizontalAlignment="Left"
+                                    IsActive="{x:Bind IsThinking}"
+                                    Visibility="{x:Bind IsThinking, Converter={StaticResource BooleanToVisibilityConverter}}" />
+
+
+                            </StackPanel>
+                        </Grid>
+
+                        <StackPanel
+                            Margin="12,2,0,0"
+                            HorizontalAlignment="Left"
+                            Orientation="Horizontal">
+                            <TextBlock
+                                FontSize="10"
+                                Opacity="0.6"
+                                Text="{x:Bind Source}" />
+                            <TextBlock
+                                Margin="8,0,0,0"
+                                FontSize="10"
+                                Opacity="0.6"
+                                Text="{x:Bind Timestamp}" />
+                        </StackPanel>
+
+                    </StackPanel>
+
+
+
+                </Grid>
+            </DataTemplate>
+        </ItemsRepeater.ItemTemplate>
+    </ItemsRepeater>
+</UserControl>

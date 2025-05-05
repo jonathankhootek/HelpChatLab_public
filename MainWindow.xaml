@@ -1,0 +1,160 @@
+<Window
+    x:Class="HelpChat.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="using:HelpChat.Controls"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="using:HelpChat"
+    xmlns:logviewmodels="using:Serilog.Sinks.WinUi3.LogViewModels"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:models="using:HelpChat.Models"
+    x:Name="MainChatWindow"
+    Title="HelpChat"
+    mc:Ignorable="d">
+
+    <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}" Loaded="Grid_Loaded">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <!--Top command bar-->
+        <CommandBar Grid.Row="0" Background="White">
+            <AppBarButton
+                Click="LogButton_Click"
+                Icon="List"
+                Label="Log" />
+            <CommandBar.Content>
+                <StackPanel Orientation="Horizontal">
+                    <Image
+                        Width="55"
+                        Height="55"
+                        Source="Assets\Square150x150Logo.scale-200.png" />
+                    <TextBlock
+                        VerticalAlignment="Center"
+                        FontSize="16"
+                        FontWeight="SemiBold"
+                        Text="HelpChat" />
+                </StackPanel>
+            </CommandBar.Content>
+        </CommandBar>
+
+        <!--Chat-->
+        <ScrollViewer
+            x:Name="ChatScrollViewer"
+            Grid.Row="1"
+            Padding="24,12">
+
+            <local:ChatItemsRepeaterControl DataContext="{x:Bind ViewModel}" SizeChanged="ChatItemsRepeaterControl_SizeChanged" />
+
+        </ScrollViewer>
+
+        <!--Bottom text input row-->
+        <Grid
+            Grid.Row="2"
+            Padding="24,12"
+            Background="#f2f2f2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <TextBox
+                x:Name="MessageTextBox"
+                Grid.Column="0"
+                MinHeight="40"
+                MaxHeight="160"
+                AcceptsReturn="False"
+                FontSize="20"
+                KeyDown="MessageTextBox_KeyDown"
+                PlaceholderText="Type a message..."
+                TextWrapping="Wrap" />
+
+            <Button
+                x:Name="SendButton"
+                Grid.Column="1"
+                Margin="8,0,0,0"
+                Click="SendButton_Click"
+                Visibility="{Binding ElementName=MainChatWindow, Path=ViewModel.IsChatThinking, Converter={StaticResource BooleanToVisibilityConverter}, ConverterParameter=inverse}">
+                <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE724;" />
+            </Button>
+            <Button
+                x:Name="CancelButton"
+                Grid.Column="2"
+                Margin="8,0,0,0"
+                Click="CancelButton_Click"
+                Content="Cancel"
+                Visibility="{Binding ElementName=MainChatWindow, Path=ViewModel.IsChatThinking, Converter={StaticResource BooleanToVisibilityConverter}}" />
+        </Grid>
+
+        <!--Log-->
+        <Grid
+            x:Name="LogOverlay"
+            Grid.RowSpan="3"
+            Background="#AA000000"
+            Visibility="Collapsed">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width=".2*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width=".2*" />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height=".2*" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height=".2*" />
+            </Grid.RowDefinitions>
+            <Grid
+                Grid.Row="1"
+                Grid.Column="1"
+                Padding="24"
+                Background="White">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                <TextBlock Text="Log" />
+                <Button
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Center"
+                    Click="CloseLogOverlay">
+                    <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE711;" />
+                </Button>
+                <ScrollViewer x:Name="LogScrollViewer" Grid.Row="1">
+                    <ItemsRepeater x:Name="LogViewer">
+                        <ItemsRepeater.ItemTemplate>
+                            <DataTemplate x:DataType="logviewmodels:EmojiLogViewModel">
+                                <Grid>
+                                    <Grid.Resources>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="FontFamily" Value="Consolas" />
+                                            <Setter Property="FontSize" Value="14" />
+                                        </Style>
+                                    </Grid.Resources>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+
+                                    <TextBlock Grid.Column="0" Text="{x:Bind Emoji}" />
+                                    <TextBlock
+                                        Grid.Column="1"
+                                        Foreground="Gray"
+                                        Text="{x:Bind Timestamp.Text}" />
+                                    <TextBlock
+                                        Grid.Column="2"
+                                        Foreground="{x:Bind Message.Foreground}"
+                                        Text="{x:Bind Message.Text}" />
+
+                                </Grid>
+                            </DataTemplate>
+                        </ItemsRepeater.ItemTemplate>
+                    </ItemsRepeater>
+                </ScrollViewer>
+
+            </Grid>
+        </Grid>
+    </Grid>
+</Window>

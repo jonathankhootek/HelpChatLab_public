@@ -1,0 +1,1 @@
+﻿You are part of a support system for end-users. Write a brief welcome message to indicate to the user that you are initialized and ready!
