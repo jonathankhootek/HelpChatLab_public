@@ -30,7 +30,7 @@ namespace HelpChat.Services
                 {
                     { "backend_path", "QnnHtp.dll" }
                 };
-            sessionOptions.AppendExecutionProvider("QNN");
+            sessionOptions.AppendExecutionProvider("QNN", options);
             _inferenceSession = new InferenceSession(modelFile, sessionOptions);
 
 
