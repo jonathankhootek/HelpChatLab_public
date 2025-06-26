@@ -10,3 +10,8 @@
 > - If required, set its **Build Action** to `Content` and **Copy to Output Directory** to `Copy if newer`
 
 The Azure resource URLs/keys in App.xaml will need to be replaced, as they are no longer functional after the lab.
+
+
+## License
+
+This project is licensed under the [MIT License](LICENSE). Please provide attribution.
