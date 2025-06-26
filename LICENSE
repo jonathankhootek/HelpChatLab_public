@@ -20,9 +20,10 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
-
+=============================================================================
 Attribution Request:
 If this software is used in a public-facing product or service, we request 
 visible attribution in the UI. It should include: 
 
 "Originally created by Jonathan Khoo / Teknikos (https://teknikos.com)".
+=============================================================================
