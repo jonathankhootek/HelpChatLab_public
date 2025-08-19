@@ -1,6 +1,6 @@
 # HelpChat Lab Files
 
-### NOTE: The implementation of Phi Silica has changed and you must complete these additional steps to make the application run correctly: https://learn.microsoft.com/en-us/windows/ai/apis/get-started?tabs=winget%2Cwinui%2Cwinui2 (look for the steps starting with "Edit the Package.appxmanifest file")
+### NOTE: The implementation of Phi Silica has changed and you must complete these additional steps to make the application run correctly: https://learn.microsoft.com/en-us/windows/ai/apis/get-started?tabs=winget%2Cwinui%2Cwinui2 (look for the steps starting with "Edit the Package.appxmanifest file"). You may also need to change the implementation in PhiSilicaClient.cs.
 
 👉 The PowerPoint presentation, the Jupyter notebook, and code snippets are in the `_GOODIES INSIDE` folder.
 
