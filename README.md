@@ -1,5 +1,7 @@
 # HelpChat Lab Files
 
+### NOTE: The implementation of Phi Silica has changed and you must complete these additional steps to make the application run correctly: https://learn.microsoft.com/en-us/windows/ai/apis/get-started?tabs=winget%2Cwinui%2Cwinui2 (look for the steps starting with "Edit the Package.appxmanifest file")
+
 👉 The PowerPoint presentation, the Jupyter notebook, and code snippets are in the `_GOODIES INSIDE` folder.
 
 👉 You must make sure that your device is capable of running Phi Silica (Copilot+ PC with NPU, Windows Insider beta or higher). Be sure you can run a Phi Silica sample from the AI Dev Gallery first. https://learn.microsoft.com/en-us/windows/ai/ai-dev-gallery/
